@@ -12,6 +12,8 @@ private:
 	int Data;
 	BinaryNode*  left, * right;
 public:
+	BinaryNode* Prev;
+
 	BinaryNode();
 	BinaryNode(int);
 	~BinaryNode();

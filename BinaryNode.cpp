@@ -4,13 +4,15 @@
 BinaryNode::BinaryNode()
 :Data(-1),
 left(NULL),
-right(NULL)
+right(NULL),
+Prev(NULL)
 {}
 
 BinaryNode::BinaryNode(int l)
 : Data(l),
 left(NULL),
-right(NULL)
+right(NULL),
+Prev(NULL)
 {}
 
 BinaryNode::~BinaryNode()
