@@ -18,9 +18,9 @@ public:
 	BinaryNode(int);
 	~BinaryNode();
 
-	BinaryNode* get_left()const;
-	BinaryNode* get_right()const;
-	int get_data()const;
+	BinaryNode* get_left();
+	BinaryNode* get_right();
+	int get_data();
 
 	void set_left(BinaryNode*);
 	void set_right(BinaryNode*);

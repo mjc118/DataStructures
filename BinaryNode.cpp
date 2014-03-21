@@ -20,11 +20,11 @@ BinaryNode::~BinaryNode()
 }
 
 //accessors
-BinaryNode* BinaryNode::get_left()const{ return left; }
+BinaryNode* BinaryNode::get_left(){ return left; }
 
-BinaryNode* BinaryNode::get_right()const{ return right; }
+BinaryNode* BinaryNode::get_right(){ return right; }
 
-int BinaryNode::get_data()const{ return Data; }
+int BinaryNode::get_data(){ return Data; }
 
 //mutators
 void BinaryNode::set_left(BinaryNode* l){ left = l; }

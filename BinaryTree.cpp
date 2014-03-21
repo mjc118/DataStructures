@@ -11,11 +11,29 @@ BinaryTree::BinaryTree(BinaryNode* n)
 
 BinaryTree::~BinaryTree()
 {
+	Destruct(Root);
+}
+
+void BinaryTree::Destruct(BinaryNode* rn){
+	if (rn == NULL)
+		return;
+	if (rn->get_right() != NULL)
+		Destruct(rn->get_right());
+	if (rn->get_left() != NULL)
+		Destruct(rn->get_left());
+
+	delete rn;
+	return;
 }
 
 BinaryNode* BinaryTree::Get_Root()const{ return Root; }
 
 bool BinaryTree::Insert(BinaryNode* ln){
+	if (Search(ln->get_data(), Root)){
+		std::cout << "That value is already in the tree\n";
+		delete ln;
+		return false;
+	}
 
 	if (!Root){
 		Root = ln;
@@ -53,13 +71,13 @@ BinaryNode* BinaryTree::Check(BinaryNode* ln, BinaryNode* temproot){
 }
 
 BinaryNode* BinaryTree::Search(int num, BinaryNode* rn){
+	if (rn == NULL)
+		return NULL;
 	if (num == rn->get_data())
 		return rn;
-	
-	if (num < rn->get_data() && rn->get_left() != NULL)
+	else if (num < rn->get_data() && rn->get_left() != NULL)
 		return Search(num, rn->get_left());
-	
-	if (num > rn->get_data() && rn->get_right() != NULL)
+	else if (num > rn->get_data() && rn->get_right() != NULL)
 		return Search(num, rn->get_right());
 	
 	return NULL;
@@ -88,18 +106,27 @@ bool BinaryTree::Delete_Node(int num){
 	BinaryNode* temp = Search(num, Root);
 	bool ISL_Child = true;//figures out which side our deleted node is on
 	bool HasL_Child = true;//figures out which side it has a child when it only has one
+	bool root = false;//if node being deleted is the root of tree, this = true
 
 	if (temp == NULL)
 		return false;
+
+	if (temp == Root)
+		root = true;
+
 	if (num > temp->Prev->get_data())
 		ISL_Child = false;
 
 	//1st case, node is a leaf node
 	if ((temp->get_left() == NULL) && (temp->get_right() == NULL)){
-		if (ISL_Child)
+		if (root)
+			Root = NULL;
+		else if (ISL_Child)
 			temp->Prev->set_left(NULL);
 		else
 			temp->Prev->set_right(NULL);
+		
+		delete temp;
 	}
 	//2nd case, node has one child
 	else if((temp->get_left() == NULL || temp->get_right() == NULL) &&
@@ -108,40 +135,107 @@ bool BinaryTree::Delete_Node(int num){
 		if (temp->get_left() == NULL)
 			HasL_Child = false;
 		
-		if (HasL_Child){
+		if (root){//if the node is the Root
+			if (HasL_Child){
+				Root = temp->get_left();
+				temp->get_left()->Prev = Root;
+			}
+			else{
+				Root = temp->get_right();
+				temp->get_right()->Prev = Root;
+			}
+		}
+		else if (HasL_Child){
 			if (ISL_Child)
 				temp->Prev->set_left(temp->get_left());
 			else
 				temp->Prev->set_right(temp->get_left());
+			temp->get_left()->Prev = temp->Prev;
 		}
 		else{
 			if (ISL_Child)
 				temp->Prev->set_left(temp->get_right());
 			else
 				temp->Prev->set_right(temp->get_right());
+			temp->get_right()->Prev = temp->Prev;
 		}
-	}
-	//3rd case, node has two children
-	else if ((temp->get_left() != NULL) && (temp->get_right() != NULL)){//both should return true if they have children
-		BinaryNode* predecessor = Predecessor(temp->get_left());
-		//FIX THIS
-		predecessor->Prev->set_right(predecessor->get_left());//takes care of loose ends before moving our predecessor
-
-		predecessor->set_left(temp->get_left());
-		predecessor->set_right(temp->get_right());
-		
-		if (ISL_Child)
-			temp->Prev->set_left(predecessor);
-		else
-			temp->Prev->set_right(predecessor);
-	}
 
 		delete temp;
+	}
+	//3rd case, node has two children
+	else if ((temp->get_left() != NULL) && (temp->get_right() != NULL)){
+		BinaryNode* Predecessor = temp->get_left();
+		while (Predecessor->get_right() != NULL)
+			Predecessor = Predecessor->get_right();
+		//Don't ask me, this function is evil
+		if (temp == Root){
+			if (Predecessor == temp->get_left()){
+				Root = Predecessor;
+				Predecessor->set_right(temp->get_right());
+				Predecessor->Prev = Root;
+
+				delete temp;
+			}
+			else{
+				Predecessor->Prev->set_right(Predecessor->get_left());
+				Root = Predecessor;
+				Predecessor->set_left(temp->get_left());
+				Predecessor->set_right(temp->get_right());
+				Predecessor->Prev = Root;
+				delete temp;
+			}
+		}
+		else if (Predecessor == temp->get_left()){
+			if (ISL_Child)
+				temp->Prev->set_left(Predecessor);
+			else
+				temp->Prev->set_right(Predecessor);
+			Predecessor->set_right(temp->get_right());
+			Predecessor->Prev = temp->Prev;
+
+			delete temp;
+		}
+		else{
+			Predecessor->Prev->set_right(Predecessor->get_left());
+			if (ISL_Child)
+				temp->Prev->set_left(Predecessor);
+			else
+				temp->Prev->set_right(Predecessor);
+
+			Predecessor->set_left(temp->get_left());
+			Predecessor->set_right(temp->get_right());
+			Predecessor->Prev = temp->Prev;
+			delete temp;
+		}
+	}
+
 	return true;
 }
 
-BinaryNode* BinaryTree::Predecessor(BinaryNode* ln){
-	if (ln->get_right() != NULL)
-		Predecessor(ln->get_right());
-	return ln;
+
+int BinaryTree::Depth(BinaryNode* ln, BinaryNode* TempRoot, int ans){
+	if (ln == NULL)
+		return -1;
+	if (TempRoot == ln)
+		return ans;
+	
+	if (ln->get_data() < TempRoot->get_data())
+		Depth(ln, TempRoot->get_left(), ++ans);
+	else
+		Depth(ln, TempRoot->get_right(), ++ans);
+}
+
+int BinaryTree::Height(BinaryNode* rn){
+	if (rn == NULL)
+		return -1;
+	else
+		return 1 + std::max(Height(rn->get_left()), Height(rn->get_right()));
+}
+
+bool BinaryTree::Balanced(BinaryNode* rn){
+	if (rn == NULL)
+		return true;
+	if (abs(Height(rn->get_left()) - Height(rn->get_right())) > 1)
+		return false;
+	return true;
 }

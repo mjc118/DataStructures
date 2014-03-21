@@ -9,38 +9,93 @@
 
 using namespace std;
 
+bool Switch(int);
+
 int main(){
-	BinaryTree Tree;
-	BinaryNode * node1 = new BinaryNode(1);
-	BinaryNode * node2 = new BinaryNode(2);
-	BinaryNode * node3 = new BinaryNode(3);
-	BinaryNode * node4 = new BinaryNode(4);
-	BinaryNode * node5 = new BinaryNode(5);
-	BinaryNode * node6 = new BinaryNode(6);
-	BinaryNode * node7 = new BinaryNode(7);
+	int input;
 
-	Tree.Insert(node7);
-	Tree.Insert(node5);
-	Tree.Insert(node6);
-	Tree.Insert(node2);
-	Tree.Insert(node4);
-	Tree.Insert(node3);
-	Tree.Insert(node1);
+	do{
+		cout << "---Make a Selection---\n";
+		cout << "1) Insert a Value\n";
+		cout << "2) Delete a Value\n";
+		cout << "3) Search for a Value\n";
+		cout << "4) Print entire Tree\n";
+		cout << "5) Find the Depth of a specific Node\n";
+		cout << "6) Display the Cost of your tree\n";
+		cout << "7) Check if the Tree is Balanced\n";
+		cout << "8) Exit\n";
 
-	if(Tree.Search(4, Tree.Get_Root()))
-		cout << "true\n";
-	Tree.Print(Tree.Get_Root());
-	cout << endl << Tree.Cost(Tree.Get_Root()) << endl;
-	Tree.Delete_Node(5);
-	Tree.Print(Tree.Get_Root());
+		cin >> input;
 
-	//Tree.Print(Tree.Get_Root());
-	/*cout << "4's parent " << node2->Prev << " , 2's " << node3->Prev << " , 3's L & R address's " << node1->get_left() << " " << node1->get_right() << endl;
-	cout << "2 address " << node3 << " , 4 address " << node2 << endl;
-	cout << "3 address " << node1 << " , left child of 5 " << node->get_left() << endl;
-	cout << node2->Prev->get_data();
-	*/
+	} while (Switch(input));
 
 	system("pause");
 	return 0;
+}
+
+bool Switch(int n){
+	static BinaryTree Tree;
+	int input;
+	switch (n){
+	case 1:{
+			   cout << "Input an integer to be inserted\n";
+			   cin >> input;
+			   BinaryNode* ln = new BinaryNode(input);
+			   Tree.Insert(ln);
+			   break;
+	}
+	case 2:{
+			   cout << "Input an integer that will be deleted\n";
+			   cin >> input;
+			   //delete stuff
+			   Tree.Delete_Node(input);
+			   break;
+	}
+	case 3:{
+			   cout << "Input an integer to be searched for\n";
+			   cin >> input;
+			   if (Tree.Search(input, Tree.Get_Root()))
+				   cout << "Exists in Tree\n";
+			   else
+				   cout << "Does not exist in Tree\n";
+			   break;
+	}
+	case 4:{
+			   Tree.Print(Tree.Get_Root());
+			   cout << endl;
+			   break;
+	}
+	case 5:{
+			   cout << "Input the value of the node whos Depth you want\n";
+			   cin >> input;
+			   int x = Tree.Depth(Tree.Search(input, Tree.Get_Root()), Tree.Get_Root());
+
+			   if (x >= 0)
+				   cout << x << endl;
+			   else
+				   cout << "No such node exists in the tree.\n";
+			   break;
+	}
+	case 6:{
+			   cout << Tree.Cost(Tree.Get_Root()) << endl;
+			   break;
+	}
+	case 7:{
+			   if (Tree.Balanced(Tree.Get_Root()))
+				   cout << "The tree is balanced\n";
+			   else
+				   cout << "The tree is not balanced\n";
+			   break;
+	}
+	case 8:{
+			   return false;
+			   break;
+	}
+	default:{
+				cout << "Input a valid Menu Command\n";
+				return true;
+				break;
+	}
+	}
+	return true;
 }
